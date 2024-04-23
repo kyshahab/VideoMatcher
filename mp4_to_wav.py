@@ -1,13 +1,15 @@
 import os
 import json
 import subprocess
-import ffmpeg
 import cv2 
 import numpy as np
 from tqdm import tqdm 
 import librosa 
 from scipy.spatial.distance import euclidean
 import math
+
+# FFMPEG_PATH = 'ffmpeg'
+FFMPEG_PATH = '/Users/Caleb/Documents/ffmpeg-5.0-essentials_build/bin/ffmpeg.exe'
 
 #convert mp4 files to wav 
 def create_wav_files(input_folder, output_folder):
@@ -17,7 +19,7 @@ def create_wav_files(input_folder, output_folder):
             input_file = os.path.join(input_folder, file)
             output_file = os.path.join(output_folder, f'{file.split(".")[0]}.wav')
             subprocess.run([
-                'ffmpeg', 
+                FFMPEG_PATH, 
                 '-i', input_file, 
                 '-vn', 
                 '-ar', '44100',  
@@ -29,7 +31,7 @@ def create_wav_files(input_folder, output_folder):
 
 def create_query_wav(query_vid, output_file):
     subprocess.run([
-        'ffmpeg', 
+        FFMPEG_PATH, 
         '-i', query_vid, 
         '-vn', 
         '-ar', '44100',  
@@ -194,11 +196,11 @@ print("script running")
 def main():
 
     # folder with all videos
-    input_folder = '/Users/C1/Classes/CSCI576/csci576_project/videos'
+    # input_folder = '/Users/C1/Classes/CSCI576/csci576_project/videos'
+    input_folder = 'videos'
 
-
-    output_folder = "/Users/C1/Classes/CSCI576/csci576_project/audio"
-
+    # output_folder = "/Users/C1/Classes/CSCI576/csci576_project/audio"
+    output_folder = 'audio'
 
 
 

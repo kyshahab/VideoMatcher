@@ -10,7 +10,8 @@ from search import read_shotlist, match_shotlist
 
 import os
 
-root_dir = '/Users/C1/Classes/CSCI576/csci576_project/'
+# root_dir = '/Users/C1/Classes/CSCI576/csci576_project/'
+root_dir = '.'
 
 def main():
 

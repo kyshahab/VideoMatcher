@@ -1,9 +1,9 @@
 # Index a file from dataset
 
 import numpy as np
+import os
 from calc_shots import calc_shotlist
 
-import os
 
 # build inverted index
 def build_invind(filename, shot_list):

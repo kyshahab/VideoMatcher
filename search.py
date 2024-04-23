@@ -29,22 +29,22 @@ def read_invindex(filename):
 # find possible locations based on shot list
 def match_shotlist(src, query):
 
-    possible_locs = []
+    results = []
 
     # brute force
     for i in range(len(src)-len(query)):
         for j in range(len(query)):
-            if j == 0:
+            if j == 0:  # first shot
                 if src[i][1] < query[0][1]:
                     break
-            elif j == len(query) - 1:
+            elif j == len(query) - 1:  # last shot
                 if src[i+j][1] >= query[j][1]:
-                    possible_locs.append(src[i][0])
+                    results.append(src[i][0])
                     break
-            else:
+            else:  # middle shots
                 if src[i+j][1] != query[j][1]:
                     break
-    return possible_locs
+    return results
 
 
 if __name__ == "__main__":

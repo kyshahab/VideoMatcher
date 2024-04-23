@@ -1,0 +1,7 @@
+__pycache__/
+index/
+videos/
+audio/
+colors.json
+**/*.mp4
+**/*.wav
