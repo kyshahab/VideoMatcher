@@ -24,10 +24,10 @@ def main():
 	shot_list_dir = os.path.join(root_dir, 'index')
 
 	# input file path
-	query_file = os.path.join(root_dir, 'video_6_1_filtered.mp4')
+	query_file = os.path.join(root_dir, 'Queries/video8_1_modified.mp4')
 
 	# if this path doesn't exist, the code will generate a wav file to this path
-	query_wav_path = os.path.join(root_dir, 'video_6_1_filtered.wav')
+	query_wav_path = os.path.join(root_dir, 'Queries/video8_1_modified.wav')
 
 
 
@@ -54,34 +54,51 @@ def main():
 
 	# get shotlists for each video in video_names
 	# returns dictionary with video name key, possible locations as value
-	possible_locs = match_multiple_shotlists(input_shot_list, shot_list_dir, videos=video_names)
+	possible_locs, possible_vids = match_multiple_shotlists(input_shot_list, shot_list_dir, videos=video_names)
 	print(possible_locs)
+	print(possible_vids)
+
+	# if shot boundary doesn't find any possible locs, check everything in the next step
+	if (len(possible_vids) == 0):
+		possible_vids = video_names
 
 
 	# get the k best results using color, each as a list of 5 video names, start frames, errors, where the same index corresponds to the same value
 	# for example, top_k_color_video_names[i] is best video, with best start frame top_k_color_start_frames[i] and error top_k_color_errors[i]
 	# note these lists aren't sorted by error, so the 0th index might not necessarily be the best error video
 	# only searches videos specified in video_names list
-	top_k_color_video_names, top_k_color_start_frames, top_k_color_errors = get_best_color(color_input_dict, colors, k=5, step_size=600, videos=video_names)
+	# step_size is the jump size when sliding the query video across the database videos
+	top_k_color_video_names, top_k_color_start_frames, top_k_color_errors = get_best_color(color_input_dict, colors, k=10, step_size=600, videos=possible_vids)
 	
 	print(top_k_color_video_names)
 	print(top_k_color_start_frames)
 	print(top_k_color_errors)
 	
 	
+	top_vids = list(set(top_k_color_video_names))
+	print(top_vids)
 	# same as above for audio
 	# only searches videos specified in video_names list
-	top_k_audio_video_names, top_k_audio_start_frames, top_k_audio_errors = get_best_audio(audio_input_dict, audios, k=5, videos=video_names)
+	top_k_audio_video_names, top_k_audio_start_frames, top_k_audio_errors = get_best_audio(audio_input_dict, audios, k=1, videos=top_vids)
 
 	print(top_k_audio_video_names)
 	print(top_k_audio_start_frames)
 	print(top_k_audio_errors)
 
 
+	best_video = top_k_audio_video_names[0]
+	# add 2 to best frame to fix the mapping from video frame to audio frame
+	best_frame = top_k_audio_start_frames[0] + 2
+
+	print("Best video: " + best_video)
+	print("Best start frame: " + str(best_frame))
+
+
 
 def match_multiple_shotlists(input_shot_list,shot_list_dir, videos=[]):
 
 	outputs = {}
+	possible_vids = []
 
 	for video in videos:
 		print("Checking shot list for " + video)
@@ -90,9 +107,14 @@ def match_multiple_shotlists(input_shot_list,shot_list_dir, videos=[]):
 		src_shot_list = read_shotlist(shot_list_path)
 		possible_locs = match_shotlist(src_shot_list, input_shot_list)
 
+		print(possible_locs)
+
+		if (len(possible_locs) != 0):
+			possible_vids.append(video)
+
 		outputs[video] = possible_locs
 
-	return outputs
+	return outputs, possible_vids
 
 
 
