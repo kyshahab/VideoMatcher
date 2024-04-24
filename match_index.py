@@ -5,7 +5,7 @@ from color import read_stats, get_stats, get_best_color
 
 from calc_shots import calc_shotlist
 
-from search import read_shotlist, match_shotlist
+from search import read_shotlist, match_shotlist, read_invindex
 
 
 import os
@@ -104,9 +104,11 @@ def match_multiple_shotlists(input_shot_list,shot_list_dir, videos=[]):
 	for video in videos:
 		print("Checking shot list for " + video)
 		shot_list_path = os.path.join(shot_list_dir, video + "_list.csv")
+		inv_index_path = os.path.join(shot_list_dir, video + "_ind.txt")
 
 		src_shot_list = read_shotlist(shot_list_path)
-		possible_locs = match_shotlist(src_shot_list, input_shot_list)
+		inv_index = read_invindex(inv_index_path)
+		possible_locs = match_shotlist(src_shot_list, input_shot_list, inv_index)
 
 		print(possible_locs)
 

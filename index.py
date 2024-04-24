@@ -1,14 +1,14 @@
 # Index a file from dataset
 
 import numpy as np
+import sys
 import os
+import glob
 from calc_shots import calc_shotlist
 
 
 # build inverted index
 def build_invind(filename, shot_list):
-    indexfilename = "index/" + filename.split("/")[-1].split(".")[0] + "_ind.txt"
-    
     index = {}
     lines = []
     for start, length in shot_list:
@@ -20,26 +20,31 @@ def build_invind(filename, shot_list):
         line = str(key) + ":" + ",".join(str(start) for start in index[key]) + "\n"
         lines.append(line)
     
-    f = open(indexfilename, "w")
+    f = open(filename, "w")
     f.writelines(lines)
     f.close()
 
 
 if __name__ == "__main__":
 
+    # VIDEO_DIR = '/Users/C1/classes/CSCI576/csci576_project/videos/video'
+    VIDEO_DIR = 'videos'
 
-
-    filenames = ['/Users/C1/classes/CSCI576/csci576_project/videos/video' + str(i) + '.mp4' for i in range(1, 21)] 
+    if len(sys.argv) == 2:
+        files = [sys.argv[1]]
+    else:
+        files = glob.glob(os.path.join(VIDEO_DIR, "*.mp4"))
 
     os.makedirs('index', exist_ok=True)
+    for file in files:
+        video_name = os.path.basename(file).split(".")[0]
 
-    for filename in filenames:
         # calculate and save shot list
-        shot_list = calc_shotlist(filename)
+        shot_list = calc_shotlist(file)
 
-
-        outfilename = "index/" + filename.split("/")[-1].split(".")[0] + "_list.csv"
-        np.savetxt(outfilename, shot_list, delimiter=",", fmt="%d")
+        list_filename = os.path.join("index", video_name + "_list.csv")
+        np.savetxt(list_filename, shot_list, delimiter=",", fmt="%d")
 
         # build inverse index
-        build_invind(filename, shot_list)
+        index_filename = os.path.join("index", video_name + "_ind.txt")
+        build_invind(index_filename, shot_list)

@@ -27,7 +27,6 @@ def calc_shotlist(filename):
         # use norm to find euclidian distance
         norm = np.linalg.norm(diff, axis=2)
         val = np.mean(norm)
-
         frame_diffs.append(val)
 
         prev_frame = curr_frame
@@ -37,12 +36,14 @@ def calc_shotlist(filename):
     video.release()
     pbar.close()
 
-    # process diffs in 17 (8+1+8) frame window
-    # look at prev 8 and next 8 frames
+    # process diffs in 16 (8+1+7) frame window
+    # look at prev 8 and next 7 frames
     last_boundary = -1
-    for i in range(8, len(frame_diffs)-7):
-        mean = np.mean(frame_diffs[i-8:i] + frame_diffs[i+1:i+8])
-        if frame_diffs[i] > 5 and frame_diffs[i] > 3 * mean:
+    for i in range(0, len(frame_diffs)):
+        start = max(0, i - 8)
+        end = min(len(frame_diffs), i + 8)
+        mean = np.mean(frame_diffs[start:i] + frame_diffs[i+1:end])
+        if frame_diffs[i] > 10 and frame_diffs[i] > 3 * mean:
             start_frame = last_boundary + 1  # starting frame
             length = i - last_boundary       # num frames in shot
             shot_list.append((start_frame, length))
@@ -52,4 +53,3 @@ def calc_shotlist(filename):
     shot_list.append((last_boundary+1, len(frame_diffs)-last_boundary))
 
     return shot_list
-    
