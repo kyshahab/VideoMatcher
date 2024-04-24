@@ -28,7 +28,7 @@ def main():
 	query_file = os.path.join(root_dir, sys.argv[1])
 
 	# if this path doesn't exist, the code will generate a wav file to this path
-	query_wav_filename = sys.argv[1].split('.')[0] + '.wav'
+	query_wav_filename = query_file.replace('.mp4', '.wav')
 	query_wav_path = os.path.join(root_dir, query_wav_filename)
 
 
