@@ -1,10 +1,8 @@
 # Search index with query video
 
 from calc_shots import calc_shotlist
-import cv2
 import os
 import sys
-import glob
 
 def read_shotlist(filename):
     shot_list = []
@@ -30,7 +28,8 @@ def read_invindex(filename):
 
 
 # find possible locations based on shot list
-# starting frame could be on or after the "possible location"
+# each location is range of starting frames (start, end)
+# end is not inclusive
 def match_shotlist(src, query, inv_ind):
 
     results = []
@@ -40,13 +39,16 @@ def match_shotlist(src, query, inv_ind):
     elif len(query) == 1:
         for key in inv_ind.keys():
             if key >= query[0][1]:
-                results.extend(inv_ind[key])
+                frames = inv_ind[key]
+                for frame in frames:
+                    results.append((frame, frame+key-query[0][1]+1))
     elif len(query) == 2:
         # find 2 suitable shots
         for i in range(1, len(src)):
             if src[i-1][1] >= query[0][1] and src[i][1] >= query[1][1]:
                 # (2nd shot start) - (1st shot length)
-                results.append(src[i][0] - query[0][1])
+                frame = src[i][0] - query[0][1]
+                results.append((frame, frame+1))
     else:
         # brute force
         for i in range(len(src)-len(query)):
@@ -58,7 +60,7 @@ def match_shotlist(src, query, inv_ind):
                     start = src[i+1][0] - query[0][1]
                 elif j == len(query) - 1:  # last shot
                     if src[i+j][1] >= query[j][1]:
-                        results.append(start)
+                        results.append((start, start+1))
                         break
                 else:  # middle shots
                     if src[i+j][1] != query[j][1]:

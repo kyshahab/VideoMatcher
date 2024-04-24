@@ -49,8 +49,14 @@ def vid_from_aud(audio_frame_index):
     video_frame_index = int((audio_frame_index / audio_fps) * video_fps)
     return video_frame_index
 
+def aud_from_vid(vid_frame_index):
+    sample_rate = 44100.0
+    video_fps = 30.0
+    audio_sample_index = int((vid_frame_index / video_fps) * sample_rate)
+    return audio_sample_index
 
-def get_best_audio(audio_input_dict, audios, k=5, videos = []):
+
+def get_best_audio(audio_input_dict, audios, k=5, video_locs={}):
 
 
     step_size = 1
@@ -63,22 +69,23 @@ def get_best_audio(audio_input_dict, audios, k=5, videos = []):
     num_input_audio_frames = len(audio_input_dict['norm_rms'])
 
 
-    for video_name in videos:
+    for video_name in video_locs.keys():
         print("Checking the audio of " + video_name)
 
-        num_audio_frames = len(audios[video_name]['norm_rms'])
+        for loc in video_locs[video_name]:
+            num_audio_frames = len(audios[video_name]['norm_rms'])
 
-        start_index = 0
-        while (start_index + num_input_audio_frames <= num_audio_frames):
-            
-            audio_err = get_audio_err(start_index, num_input_audio_frames, audio_input_dict, audios[video_name])
+            start_index = max(0, aud_from_vid(loc[0]-2) // 512)
+            end = aud_from_vid(loc[1]-2) // 512  # need -2 for some reason
+            while (start_index + num_input_audio_frames <= num_audio_frames) and start_index < end:
+                audio_err = get_audio_err(start_index, num_input_audio_frames, audio_input_dict, audios[video_name])
 
-            idx = np.argmax(best_errs)
-            if audio_err < best_errs[idx]:
-                best_errs[idx] = audio_err
-                best_frames[idx] = vid_from_aud(start_index*512)
-                best_videos[idx] = video_name
-            start_index+=step_size
+                idx = np.argmax(best_errs)
+                if audio_err < best_errs[idx]:
+                    best_errs[idx] = audio_err
+                    best_frames[idx] = vid_from_aud(start_index*512)
+                    best_videos[idx] = video_name
+                start_index+=step_size
     
     return (best_videos, best_frames, best_errs)
 
@@ -191,7 +198,6 @@ def load_signature(file_path):
         sig = json.load(f)
     return np.array(sig['norm_rms'] + sig['norm_spectral_centroid'])
 
-print("script running")
 
 def main():
 
