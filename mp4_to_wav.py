@@ -8,8 +8,8 @@ import librosa
 from scipy.spatial.distance import euclidean
 import math
 
-# FFMPEG_PATH = 'ffmpeg'
-FFMPEG_PATH = '/Users/Caleb/Documents/ffmpeg-5.0-essentials_build/bin/ffmpeg.exe'
+FFMPEG_PATH = 'ffmpeg'
+# FFMPEG_PATH = '/Users/Caleb/Documents/ffmpeg-5.0-essentials_build/bin/ffmpeg.exe'
 
 #convert mp4 files to wav 
 def create_wav_files(input_folder, output_folder):
@@ -55,19 +55,42 @@ def aud_from_vid(vid_frame_index):
     audio_sample_index = int((vid_frame_index / video_fps) * sample_rate)
     return audio_sample_index
 
+# search through set of videos
+def get_best_audio(audio_input_dict, audios, k=5, step_size=1, videos = []):
+    best_videos = ['video6.mp4' for i in range(k)]
+    best_frames = [0 for i in range(k)]
+    best_errs = [math.inf for i in range(k)]
 
-def get_best_audio(audio_input_dict, audios, k=5, video_locs={}):
+    num_input_audio_frames = len(audio_input_dict['norm_rms'])
 
+    for video_name in videos:
+        print("Checking the audio of " + video_name)
 
+        num_audio_frames = len(audios[video_name]['norm_rms'])
+
+        start_index = 0
+        while (start_index + num_input_audio_frames <= num_audio_frames):
+            
+            audio_err = get_audio_err(start_index, num_input_audio_frames, audio_input_dict, audios[video_name])
+
+            idx = np.argmax(best_errs)
+            if audio_err < best_errs[idx]:
+                best_errs[idx] = audio_err
+                best_frames[idx] = vid_from_aud(start_index*512)
+                best_videos[idx] = video_name
+            start_index+=step_size
+    
+    return (best_videos, best_frames, best_errs)
+
+# search through range of frames in videos
+def get_best_audio_loc(audio_input_dict, audios, k=5, video_locs={}):
     step_size = 1
 
     best_videos = ['video6.mp4' for i in range(k)]
     best_frames = [0 for i in range(k)]
     best_errs = [math.inf for i in range(k)]
 
-
     num_input_audio_frames = len(audio_input_dict['norm_rms'])
-
 
     for video_name in video_locs.keys():
         print("Checking the audio of " + video_name)

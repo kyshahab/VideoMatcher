@@ -48,43 +48,65 @@ def main():
 
 
 
-def get_best_color(color_input_dict, colors, k=5, step_size=600, video_locs={}):
+def get_best_color(color_input_dict, colors, k=5, step_size=600, videos=[]):
 
-
-
-	best_videos = []
-	best_frames = []
-	best_errs = []
+	best_videos = ['video6.mp4' for i in range(k)]
+	best_frames = [0 for i in range(k)]
+	best_errs = [math.inf for i in range(k)]
 
 
 	num_frames = len(color_input_dict['order'])
 
 
-	for video_name in video_locs.keys():
+	for video_name in videos:
 		print("Checking the color of " + video_name)
 
 		num_vid_frames = len(colors[video_name]['order'])
 
+		start_index = 0
+		while (start_index + num_frames <= num_vid_frames):
+			total_err = compare_window(start_index, num_frames, color_input_dict, colors[video_name])
+
+			idx = np.argmax(best_errs)
+			if total_err < best_errs[idx]:
+				best_errs[idx] = total_err
+				best_frames[idx] = start_index
+				best_videos[idx] = video_name
+
+
+			start_index+=step_size
+
+
+	return (best_videos, best_frames, best_errs)
+
+
+def get_best_color_loc(color_input_dict, colors, k=5, video_locs={}):
+	best_videos = []
+	best_frames = []
+	best_errs = []
+
+	num_frames = len(color_input_dict['order'])
+
+	for video_name in video_locs.keys():
+		print("Checking the color of " + video_name)
+
+		#num_vid_frames = len(colors[video_name]['order'])
+
 		for loc in video_locs[video_name]:
-			start_index = loc[0] #- (loc[0] % step_size)
-			while (start_index + num_frames <= num_vid_frames) and start_index < loc[1]:
-				total_err = compare_window(start_index, num_frames, color_input_dict, colors[video_name])
+			start_index = loc
+			
+			total_err = compare_window(start_index, num_frames, color_input_dict, colors[video_name])
 
-				if len(best_errs) == 5:
-					idx = np.argmax(best_errs)
-					if total_err < best_errs[idx]:
-						best_errs[idx] = total_err
-						best_frames[idx] = start_index
-						best_videos[idx] = video_name
-				else:
-					best_errs.append(total_err)
-					best_frames.append(start_index)
-					best_videos.append(video_name)
-
-
-				start_index+=step_size
-	
-
+			if len(best_errs) == k:
+				idx = np.argmax(best_errs)
+				if total_err < best_errs[idx]:
+					best_errs[idx] = total_err
+					best_frames[idx] = start_index
+					best_videos[idx] = video_name
+			else:
+				best_errs.append(total_err)
+				best_frames.append(start_index)
+				best_videos.append(video_name)
 
 	return (best_videos, best_frames, best_errs)
 
