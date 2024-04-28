@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import QApplication
 
 import sys
 import os
-import glob 
+import glob
 
 root_dir = '.'
 
@@ -109,7 +109,7 @@ def main():
 		best_video = best_video[:-4]
 
 	print("Best video getting read:" + best_video)
-	best_vid_path = os.path.join(root_dir, "Queries", f"{best_video}.mp4")
+	best_vid_path = os.path.join(root_dir, "videos", f"{best_video}.mp4")
 	app = QApplication(sys.argv)
 	vidplayer = VidPlayer(best_vid_path, best_frame)
 	vidplayer.show()
