@@ -17,40 +17,10 @@ import json
 
 import argparse
 
+from scipy.spatial.distance import euclidean
 
 
-
-
-'''
-def main():
-
-
-
-	ind = 4*(args.collection - 1) + 1
-	videos =["/home1/kyshahab/project/videos/video" + str(i) + ".mp4" for i in range(ind, ind+4)]
-	stats_file = 'colors_' + str(args.collection) + '.json'
-	save_stats(videos, stats_file)
-
-	input_file = "./video_6_1_filtered.mp4"
-	stats_file = 'temp.json'
-	compare_all(input_file, stats_file)
-	
-
-	
-
-
-	#player = play_video('videos/video6.mp4', 12240)
-	
-
-# maybe step faster, save the 5 smallest error windows, and look around 20 windows of that for the final result?
-
-'''
-
-
-
-def get_best_color(color_input_dict, colors, k=5, step_size = 600, videos = []):
-
-
+def get_best_color(color_input_dict, colors, k=5, step_size=600, videos=[]):
 
 	best_videos = ['video6.mp4' for i in range(k)]
 	best_frames = [0 for i in range(k)]
@@ -65,7 +35,6 @@ def get_best_color(color_input_dict, colors, k=5, step_size = 600, videos = []):
 
 		num_vid_frames = len(colors[video_name]['order'])
 
-
 		start_index = 0
 		while (start_index + num_frames <= num_vid_frames):
 			total_err = compare_window(start_index, num_frames, color_input_dict, colors[video_name])
@@ -78,41 +47,40 @@ def get_best_color(color_input_dict, colors, k=5, step_size = 600, videos = []):
 
 
 			start_index+=step_size
-	
 
 
 	return (best_videos, best_frames, best_errs)
 
 
+def get_best_color_loc(color_input_dict, colors, k=5, video_locs={}):
+	best_videos = []
+	best_frames = []
+	best_errs = []
 
-'''
-	for i in range(0, k):
-		start = max(0, best_frames[i] - step_size)
-		end = min(len(all_vids[best_videos[i]]['order']), best_frames[i] + step_size)
+	num_frames = len(color_input_dict['order'])
 
-		min_err = best_errs[i]
-		best_start = best_frames[i]
+	for video_name in video_locs.keys():
+		print("Checking the color of " + video_name)
 
+		#num_vid_frames = len(colors[video_name]['order'])
 
-		while start < end:
-			total_err = compare_window(start, num_frames, input_dict, all_vids[best_videos[i]])
+		for loc in video_locs[video_name]:
+			start_index = loc
+			
+			total_err = compare_window(start_index, num_frames, color_input_dict, colors[video_name])
 
-			if total_err < min_err:
-				min_err = total_err
-				best_start = start
+			if len(best_errs) == k:
+				idx = np.argmax(best_errs)
+				if total_err < best_errs[idx]:
+					best_errs[idx] = total_err
+					best_frames[idx] = start_index
+					best_videos[idx] = video_name
+			else:
+				best_errs.append(total_err)
+				best_frames.append(start_index)
+				best_videos.append(video_name)
 
-
-			start += 10
-
-		best_errs[i] = min_err
-		best_frames[i] = best_start
-
-
-	print("Fine-grained")
-	print(best_errs)
-	print(best_frames)
-	'''
-	
+	return (best_videos, best_frames, best_errs)
 
 
 
@@ -273,8 +241,8 @@ def extract_frames(video_path):
 
 	# Iterate through frames
 	while success:
-	    frames.append(frame)
-	    success, frame = video_capture.read()
+		frames.append(frame)
+		success, frame = video_capture.read()
 
 	# Release the video capture object
 	video_capture.release()
@@ -324,12 +292,3 @@ def dominant_colors(labels, n_colors):
 	color_order = [key for key, value in sorted_items]
 
 	return (color_order, color_counts)
-
-
-
-
-
-
-
-if __name__ == '__main__':
-	main()

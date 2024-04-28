@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
 
 
-    filenames = ['/Users/C1/classes/CSCI576/csci576_project/videos/video' + str(i) + '.mp4' for i in range(1, 21)] 
+    filenames = ['/Users/yih/Desktop/CSCI576_final_project_dataset/Queries/video' + str(i) + '.mp4' for i in range(1, 21)] 
 
     os.makedirs('index', exist_ok=True)
 
