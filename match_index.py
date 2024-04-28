@@ -7,11 +7,13 @@ from calc_shots import calc_shotlist
 
 from search import read_shotlist, match_shotlist, read_invindex
 
+from vidplayer import VidPlayer
+from PyQt5.QtWidgets import QApplication
+
 import sys
 import os
-import glob
+import glob 
 
-# root_dir = '/Users/C1/Classes/CSCI576/csci576_project/'
 root_dir = '.'
 
 def main():
@@ -103,7 +105,15 @@ def main():
 	print("Best video: " + best_video)
 	print("Best start frame: " + str(best_frame))
 
+	if best_video.endswith(".mp4"): #prevent mp4.mp4 error
+		best_video = best_video[:-4]
 
+	print("Best video getting read:" + best_video)
+	best_vid_path = os.path.join(root_dir, "Queries", f"{best_video}.mp4")
+	app = QApplication(sys.argv)
+	vidplayer = VidPlayer(best_vid_path, best_frame)
+	vidplayer.show()
+	sys.exit(app.exec_()) 
 
 def match_multiple_shotlists(input_shot_list,shot_list_dir, videos=[]):
 

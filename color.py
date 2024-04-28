@@ -17,35 +17,7 @@ import json
 
 import argparse
 
-
-
-
-
-'''
-def main():
-
-
-
-	ind = 4*(args.collection - 1) + 1
-	videos =["/home1/kyshahab/project/videos/video" + str(i) + ".mp4" for i in range(ind, ind+4)]
-	stats_file = 'colors_' + str(args.collection) + '.json'
-	save_stats(videos, stats_file)
-
-	input_file = "./video_6_1_filtered.mp4"
-	stats_file = 'temp.json'
-	compare_all(input_file, stats_file)
-	
-
-	
-
-
-	#player = play_video('videos/video6.mp4', 12240)
-	
-
-# maybe step faster, save the 5 smallest error windows, and look around 20 windows of that for the final result?
-
-'''
-
+from scipy.spatial.distance import euclidean
 
 
 def get_best_color(color_input_dict, colors, k=5, step_size=600, videos=[]):
@@ -109,37 +81,6 @@ def get_best_color_loc(color_input_dict, colors, k=5, video_locs={}):
 				best_videos.append(video_name)
 
 	return (best_videos, best_frames, best_errs)
-
-
-
-'''
-	for i in range(0, k):
-		start = max(0, best_frames[i] - step_size)
-		end = min(len(all_vids[best_videos[i]]['order']), best_frames[i] + step_size)
-
-		min_err = best_errs[i]
-		best_start = best_frames[i]
-
-
-		while start < end:
-			total_err = compare_window(start, num_frames, input_dict, all_vids[best_videos[i]])
-
-			if total_err < min_err:
-				min_err = total_err
-				best_start = start
-
-
-			start += 10
-
-		best_errs[i] = min_err
-		best_frames[i] = best_start
-
-
-	print("Fine-grained")
-	print(best_errs)
-	print(best_frames)
-	'''
-	
 
 
 
@@ -351,12 +292,3 @@ def dominant_colors(labels, n_colors):
 	color_order = [key for key, value in sorted_items]
 
 	return (color_order, color_counts)
-
-
-
-
-
-
-
-# if __name__ == '__main__':
-# 	main()

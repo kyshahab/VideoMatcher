@@ -43,7 +43,7 @@ def create_query_wav(query_vid, output_file):
 
 def vid_from_aud(audio_frame_index):
 
-    audio_fps = 44100.
+    audio_fps = 44100.0
     video_fps = 30.0
     # Calculate corresponding video frame number
     video_frame_index = int((audio_frame_index / audio_fps) * video_fps)
@@ -183,8 +183,6 @@ def load_signatures(folder):
         if f.endswith(".json"):
             json_path = os.path.join(folder, f)
 
-
-
             file = open(json_path, 'r')
 
             vid_path = f[:-9]
@@ -239,20 +237,6 @@ def main():
     #create_query_wav(query_mp4_path, query_wav_path)
 
     vid_sigs = compute_signatures(output_folder, output_folder)
-    
-    '''
-    vid_sigs = load_signatures(output_folder)
-
-    print("Done computing")
-
-    query_sig = generate_audio_sig(query_wav_path)
-
-    best_match, min_dist = match_sub_sig(query_sig, vid_sigs)
-    if best_match:
-        print(f"best match: {best_match} and its distance: {min_dist}")
-    else:
-        print("no match")  
-    '''
 
 if __name__ == "__main__":
     main()

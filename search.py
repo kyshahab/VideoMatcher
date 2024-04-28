@@ -1,4 +1,3 @@
-# Search index with query video
 
 from calc_shots import calc_shotlist
 import os
